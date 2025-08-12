@@ -4,7 +4,6 @@ import BHeader from './components/BHeader.vue'
 import LibraryRegistrationForm from './components/LibraryRegistrationForm.vue'
 </script>
 
-<!-- add commit -->
 
 <template>
   <header>
