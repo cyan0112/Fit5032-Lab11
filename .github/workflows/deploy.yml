@@ -1,0 +1,32 @@
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches:
+      - main # 当有新的代码推送到 main 分支时触发此工作流
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # 在最新的Ubuntu虚拟机上运行
+    steps:
+      # 1. 检出代码
+      - name: Checkout
+        uses: actions/checkout@v4
+      # 2. 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 使用Node.js 20版本
+      # 3. 安装依赖
+      - name: Install dependencies
+        run: npm ci # npm ci 更适合 CI 环境
+      # 4. 构建项目
+      - name: Build
+        run: npm run build # 运行你的项目构建命令，通常是 npm run build
+      # 5. 部署到 GitHub Pages
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@4.1.4 # 使用第三方Actions来部署
+        with:
+          branch: gh-pages # 指定部署的分支，GitHub Pages通常使用 gh-pages 或 main 分支
+          folder: dist # 指定你的构建输出目录，Vue.js通常是 dist 文件夹
+      # 6. 设置权限（重要，确保部署Action有写入 gh-pages 分支的权限）
+      permissions:
+        contents: write
