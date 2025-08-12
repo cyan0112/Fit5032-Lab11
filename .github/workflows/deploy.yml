@@ -6,6 +6,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest # 在最新的Ubuntu虚拟机上运行
+    permissions: # <-- **注意**：权限块现在放在了这里，与 runs-on 和 steps 同级
+      contents: write # 授予写入 contents 的权限，这是部署到 GitHub Pages 所必需的
     steps:
       # 1. 检出代码
       - name: Checkout
@@ -25,8 +27,5 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@4.1.4 # 使用第三方Actions来部署
         with:
-          branch: gh-pages # 指定部署的分支，GitHub Pages通常使用 gh-pages 或 main 分支
+          branch: gh-pages # 指定部署的分支C，GitHub Pages通常使用 gh-pages 或 main 分支
           folder: dist # 指定你的构建输出目录，Vue.js通常是 dist 文件夹
-      # 6. 设置权限（重要，确保部署Action有写入 gh-pages 分支的权限）
-      permissions:
-        contents: write
