@@ -1,31 +1,43 @@
+# GitHub Pages 部署工作流
 name: Deploy to GitHub Pages
 on:
+  # 当推送到 `main` 分支时触发
   push:
     branches:
-      - main # 当有新的代码推送到 main 分支时触发此工作流
+      - main # 如果你的主分支是 master，请改为 master
+# 允许此工作流写入仓库内容，用于部署
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest # 在最新的Ubuntu虚拟机上运行
-    permissions: # <-- **注意**：权限块现在放在了这里，与 runs-on 和 steps 同级
-      contents: write # 授予写入 contents 的权限，这是部署到 GitHub Pages 所必需的
+    runs-on: ubuntu-latest
     steps:
-      # 1. 检出代码
+      # 第一步：获取你的仓库代码
       - name: Checkout
         uses: actions/checkout@v4
-      # 2. 设置 Node.js 环境
-      - name: Setup Node.js
+      # 第二步：安装 Node.js 环境
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # 使用Node.js 20版本
-      # 3. 安装依赖
+          node-version: 18 # 你可以根据项目需要修改版本
+      # 第三步：安装项目依赖
       - name: Install dependencies
-        run: npm ci # npm ci 更适合 CI 环境
-      # 4. 构建项目
+        run: npm install
+      # 第四步：构建项目，Vite 会读取 vite.config.js 的 base 配置
       - name: Build
-        run: npm run build # 运行你的项目构建命令，通常是 npm run build
-      # 5. 部署到 GitHub Pages
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@4.1.4 # 使用第三方Actions来部署
+        run: npm run build
+      # 第五步：为 GitHub Pages 配置静态文件服务器
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      # 第六步：将构建产物 (dist 目录) 上传
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          branch: gh-pages # 指定部署的分支C，GitHub Pages通常使用 gh-pages 或 main 分支
-          folder: dist # 指定你的构建输出目录，Vue.js通常是 dist 文件夹
+          # 从 dist 目录上传
+          path: './dist'
+      # 第七步：部署到 GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
